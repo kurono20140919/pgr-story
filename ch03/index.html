@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>03 종말의 전시 · 퍼니싱 스토리 다시보기</title>
+<link rel="icon" href="data:,">
+<style>
+:root{
+  --bg:#0d0f14; --panel:#151922; --line:#2a3140; --text:#e7e9ee; --muted:#8b93a4;
+  --accent:#d9b25f; --dialog:rgba(10,12,18,.86); --choice:rgba(20,24,34,.94);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);overflow-x:hidden;-webkit-tap-highlight-color:transparent;
+  font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,sans-serif}
+body{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:10px 16px 20px}
+header{width:100%;max-width:var(--w);display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;margin-bottom:8px}
+header h1{font-size:15px;margin:0 6px 0 0;font-weight:700;white-space:nowrap}
+header h1 small{color:var(--muted);font-weight:400;margin-left:6px;font-size:13px}
+header h1{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.sp{flex:1}
+select,button{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:6px;
+  padding:6px 10px;font:inherit;font-size:13px;cursor:pointer;max-width:100%}
+button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+button:hover,select:hover{border-color:#46506a}
+a.btn{display:inline-block;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:6px;
+  padding:6px 10px;font-size:13px;text-decoration:none;white-space:nowrap}
+a.btn:hover{border-color:#46506a}
+body.listing .playonly{display:none}
+body:not(.listing) .listonly{display:none}
+
+.list{width:100%;max-width:720px;padding:14px 0 30px}
+.list .t1{color:var(--muted);font-size:13px;letter-spacing:.15em}
+.list h2{font-size:clamp(22px,4.6vw,32px);margin:6px 0 4px;word-break:keep-all}
+.list .sub{color:var(--accent);font-size:14px;margin:0 0 20px}
+.eps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.eps button{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:12px 14px;font-size:15px;line-height:1.45;
+  border-radius:8px;word-break:keep-all;overflow-wrap:anywhere}
+.eps button .no{color:var(--accent);font-size:13px;min-width:2.2em;flex:none}
+.eps button.last{border-color:rgba(217,178,95,.55)}
+.eps button:hover,.eps button:focus-visible{border-color:var(--accent);outline:none}
+
+:root{--w:min(1100px, calc(100vw - 32px), calc((100vh - 130px) * 16 / 9))}
+.vn{position:relative;width:100%;max-width:var(--w);user-select:none;-webkit-user-select:none}
+.stage{position:relative;z-index:0;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:8px;background:#000;cursor:pointer;
+  container-type:inline-size}
+.bg{position:absolute;inset:0;transition:opacity .3s}
+.bg img{width:100%;height:100%;object-fit:cover;display:block}
+.bg.off{opacity:0}
+.actor{position:absolute;bottom:0;opacity:0;z-index:2;pointer-events:none;
+  transition:left .25s ease,opacity .25s,filter .2s}
+.actor.on{opacity:1}
+.actor.dim{filter:brightness(.45) saturate(.7)}
+.actor img{position:absolute;display:block}
+.actor img[hidden]{display:none}
+.actor .stand{left:0;top:0;width:100%;height:100%}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:6}
+.flash.go{animation:flash .28s ease-out}
+.fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;z-index:7;transition:opacity .35s}
+.fade.on{opacity:1}
+@keyframes flash{0%{opacity:.8}100%{opacity:0}}
+@keyframes shake{0%,100%{transform:translate(0,0)}20%{transform:translate(-10px,4px)}40%{transform:translate(9px,-5px)}
+  60%{transform:translate(-7px,3px)}80%{transform:translate(5px,-2px)}}
+.shake{animation:shake .4s}
+
+.theme{position:absolute;inset:0;z-index:9;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;opacity:0;pointer-events:none;transition:opacity .5s;text-align:center}
+.theme.on{opacity:1}
+.theme .s{color:var(--accent);font-size:clamp(12px,1.6cqi,18px);letter-spacing:.3em}
+.theme .t{font-size:clamp(22px,4.2cqi,46px);font-weight:700;letter-spacing:.08em}
+.theme .l{width:min(320px,40%);height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);margin-top:6px}
+
+.dialog{position:absolute;left:3%;right:3%;bottom:4%;min-height:27%;background:var(--dialog);
+  border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px 22px 18px;z-index:8;cursor:pointer}
+.dialog.hide{visibility:hidden}
+.name.empty{visibility:hidden}
+.name{display:block;font-weight:700;color:var(--accent);font-size:clamp(14px,1.7vw,18px);margin-bottom:4px;min-height:1.3em}
+.text{font-size:clamp(15px,1.9vw,20px);line-height:1.65;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere}
+.text.narr{color:#cfd6e4}
+.dialog .next{position:absolute;right:16px;bottom:8px;color:var(--accent);font-size:12px;opacity:0;animation:bob 1s infinite}
+.dialog.ready .next{opacity:1}
+@keyframes bob{50%{transform:translateY(3px)}}
+
+.choices{position:absolute;left:0;right:0;top:0;bottom:0;display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;z-index:11;background:rgba(0,0,0,.4);padding:0 10%}
+.choices.on{display:flex}
+.choices button{width:100%;max-width:560px;background:var(--choice);border:1px solid rgba(217,178,95,.45);
+  padding:11px 16px;font-size:clamp(14px,1.8vw,18px);border-radius:6px;text-align:left;line-height:1.5;word-break:keep-all}
+.choices button:hover,.choices button:focus-visible{border-color:var(--accent);background:rgba(40,36,24,.96);outline:none}
+.choices button b{color:var(--accent);margin-right:10px;font-weight:600}
+
+.title{position:absolute;inset:0;z-index:12;display:none;flex-direction:column;align-items:center;justify-content:center;
+  background:#05060a;text-align:center;gap:6px;padding:12px;cursor:default}
+.title.on{display:flex}
+.title .t1{color:var(--muted);font-size:clamp(11px,1.4cqi,14px);letter-spacing:.15em}
+.title .t2{font-size:clamp(30px,6cqi,60px);font-weight:700;line-height:1.1}
+.title .t3{color:var(--accent);font-size:clamp(12px,1.6cqi,16px)}
+.title .btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:12px}
+.title button,.title a.btn{font-size:15px;padding:9px 26px;border-color:var(--accent)}
+
+.log{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:20;display:none;justify-content:center;align-items:flex-start;padding:40px 16px}
+.log.on{display:flex}
+.log .box{width:100%;max-width:760px;max-height:calc(100vh - 80px);overflow:auto;background:var(--panel);
+  border:1px solid var(--line);border-radius:8px;padding:14px 18px}
+.log .row{padding:8px 0;border-bottom:1px solid var(--line);line-height:1.6;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere}
+.log .row b{color:var(--accent);display:block;font-size:13px}
+.log .row.ch{color:#a8c7ff}
+.log .row.sep{color:var(--muted);font-size:12px;text-align:center;border:0}
+.log .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+
+footer{width:100%;max-width:var(--w);color:var(--muted);font-size:12px;line-height:1.6;margin-top:10px}
+kbd{border:1px solid var(--line);border-radius:3px;padding:0 4px;font-size:11px}
+
+@media (max-width:700px){
+  header,.vn,footer{max-width:none}
+  body{padding:8px 16px 16px}
+  header h1 small{display:none}
+  .dialog{position:relative;left:auto;right:auto;bottom:auto;margin-top:8px;min-height:132px;padding:10px 14px 18px}
+  .name{font-size:15px}.text{font-size:16px}
+  .choices{position:static;display:none;background:none;padding:0;margin-top:8px}
+  .choices.on{display:flex}
+  .choices button{font-size:15px;padding:10px 12px}
+  .title button,.title a.btn{font-size:14px;padding:7px 20px}
+  .title .btns{margin-top:6px}
+  header h1{font-size:14px}
+  .hidesm{display:none}
+}
+</style>
+</head>
+<body>
+<header>
+  <a class="btn" id="tocbtn" href="../index.html">목차</a>
+  <button id="listbtn" class="playonly">편 목록</button>
+  <h1 id="chap"></h1>
+  <span class="sp"></span>
+  <button id="auto" class="playonly" aria-pressed="false" title="자동 진행 (A)">자동</button>
+  <button id="logbtn" class="playonly" title="대사 로그 (L)">로그</button>
+  <button id="snd" aria-pressed="true" title="소리 켜기/끄기">소리 켬</button>
+  <button id="restart" class="playonly"><span class="hidesm">이 편 </span>처음부터</button>
+</header>
+
+<main class="list listonly" id="listview">
+  <div class="t1" id="lgroup"></div>
+  <h2 id="ltitle"></h2>
+  <p class="sub" id="lsub"></p>
+  <ol class="eps" id="eps"></ol>
+</main>
+
+<div class="vn playonly" id="vn">
+  <div class="stage" id="stage">
+    <div class="bg off" id="bg"><img id="bgimg" alt=""></div>
+    <div id="actors"></div>
+    <div class="flash" id="flash"></div>
+    <div class="fade on" id="fade"></div>
+    <div class="theme" id="theme"></div>
+    <div class="title" id="title"></div>
+  </div>
+  <div class="dialog hide" id="dialog">
+    <div class="name" id="name"></div>
+    <div class="text" id="text"></div>
+    <div class="next">▼</div>
+  </div>
+  <div class="choices" id="choices"></div>
+</div>
+
+<div class="log" id="log"><div class="box">
+  <div class="head"><strong>대사 로그</strong><button id="logclose">닫기</button></div>
+  <div id="logrows"></div>
+</div></div>
+
+<footer class="playonly">
+  <span class="hidesm">조작: 클릭·<kbd>Space</kbd>·<kbd>Enter</kbd> 다음 / <kbd>1</kbd>~<kbd>3</kbd> 선택지 / <kbd>A</kbd> 자동 / <kbd>L</kbd> 로그</span>
+</footer>
+
+<script>
+const D = {"no":3,"key":"1/1003","group":"메인 스토리","title":"03 종말의 전시","episodes":[{"id":"zx00301ba","title":"3-1 선별","acts":[{"id":456,"t":"theme","title":"종말의 전시","sub":"챕터3"},{"id":457,"t":"anim","name":"ThemeEnable"},{"id":1,"ba":"AniZhuanchangEnd","t":"bg","src":"../assets/image/bgstory/bgstory.webp","cg":false},{"id":100,"t":"bgm","src":"../assets/audio/m_avg_general/m_avg_general.mp3"},{"id":2,"ba":"DialogEnable","t":"say","who":"가브리엘","text":"루나 아가씨께서 도착하셨어. 준비는 끝났나?","slots":[]},{"id":3,"t":"appear","slot":1,"role":"500008","face":null,"x":0},{"id":4,"t":"say","who":"롤랑","text":"물론. 게다가 공중 정원 손님들을 위한 재미있는 선물도 남겨 뒀지.","slots":[1]},{"id":5,"t":"say","who":"가브리엘","text":"또 쓸데없는 짓을 했군.","slots":[]},{"id":6,"t":"say","who":"롤랑","text":"사람마다 뜻이 다른 법이지. 가브리엘 씨, 난 당신처럼 미래를 위한 그렇게 웅대하고 정교한 청사진 같은 건 없거든.","slots":[1]},{"id":7,"t":"say","who":"롤랑","text":"기계(로봇), 구조체, 인간, 퍼니싱, 엉망진창인 이 세상이 어떤 결말을 맞이할지 난 전혀 관심 없어.","slots":[1]},{"id":8,"t":"say","who":"롤랑","text":"난 루나 아가씨만 지키면 돼. 루나 아가씨께서 원하시는 결말을 보실 수 있다면 그걸로 충분해.","slots":[1]},{"id":9,"ea":"AniZhuanchangBegin","t":"say","who":"가브리엘","text":"……","slots":[]},{"id":10,"t":"hide","slots":[1]},{"id":11,"t":"bg","src":"../assets/image/bgcg/cg204_1.webp","cg":true},{"id":101,"t":"bgm","src":"../assets/audio/m_sys_loginin/m_sys_loginin.mp3"},{"id":12,"ba":"AniZhuanchangEnd","t":"say","who":"침식체","text":"승격 네트워크에 접속할 수 있도록... 허락해 주십시오.","slots":[]},{"id":13,"t":"say","who":"침식체","text":"저희에게도... 루나 아가씨의 힘을 조금만 나눠 주십시오...","slots":[]},{"id":14,"t":"say","who":"침식체","text":"퍼니싱의... 고통에서... 벗어나고 싶습니다...","slots":[]},{"id":15,"t":"say","who":"루나","text":"참 순진하네... 그것을 받아들이고 즐기는 자만이 퍼니싱의 힘을 지배할 자격이 있어.","slots":[]},{"id":16,"t":"say","who":"롤랑","text":"퍼니싱에서 벗어나고자 하는 그런 순진한 생각을 품은 순간, 넌 이미 자격을 잃었어.","slots":[]},{"id":17,"ba":"RImgBg1Shake","t":"say","who":"침식체","text":"윽...","slots":[]},{"id":18,"t":"say","who":"","text":"롤랑이 무기를 휘둘러 침식체를 손쉽게 두 동강 냈다.","slots":[]},{"id":19,"t":"say","who":"침식체","text":"……","slots":[]},{"id":20,"t":"say","who":"롤랑","text":"승격 네트워크의 코어에 들어가서 루나 아가씨의 힘을 직접 나눠 받고 싶다면, 증명해 봐...","slots":[]},{"id":21,"t":"say","who":"롤랑","text":"자신이 퍼니싱보다 더 잔인하고 퍼니싱보다 더 강력하다는 것을...","slots":[]},{"id":22,"t":"say","who":"롤랑","text":"그래야만 너희도 퍼니싱의 주인이 될 수 있어. 알겠어?","slots":[]},{"id":23,"t":"say","who":"침식체","text":"퍼니싱의 주인...","slots":[]},{"id":24,"ba":"RImgBg1Shake","t":"say","who":"침식체","text":"주인이... 되겠습니다...!","slots":[]},{"id":25,"t":"say","who":"롤랑","text":"곧 인간들이 여기로 올 거야. 이 기회에 루나 아가씨께 증명해 봐.","slots":[]},{"id":26,"t":"say","who":"침식체","text":"인간...","slots":[]},{"id":27,"t":"say","who":"침식체","text":"인간 소멸!!! 소멸!!!","slots":[]},{"id":28,"t":"say","who":"루나","text":"롤랑.","slots":[]},{"id":29,"t":"say","who":"롤랑","text":"루나 아가씨, 어떤 지시가 있으신가요?","slots":[]},{"id":30,"t":"say","who":"루나","text":"언니 일행과 너무 오래 놀아주지는 마. 너한테 더 중요한 일이 있으니까.","slots":[]},{"id":31,"t":"say","who":"롤랑","text":"물론입니다. 겉만 그럴싸한 오합지졸 인간들 가운데서 적임자를 골라...","slots":[]},{"id":32,"end":1,"ea":"AniZhuanchangBegin","t":"say","who":"롤랑","text":"씨앗으로 삼아야 하니까요.","slots":[]}],"label":"3-1 선별"},{"id":"zx00302ba","title":"3-2 종점","acts":[{"id":1,"ba":"AniZhuanchangEnd","t":"bg","src":"../assets/image/bgstory/bgstory19.webp","cg":false},{"id":100,"t":"bgm","src":"../assets/audio/m_avg_general/m_avg_general.mp3"},{"id":2,"t":"appear","slot":1,"role":"1031001","face":null,"x":0},{"id":3,"ba":"DialogEnable","t":"say","who":"리브","text":"지휘관님, 도착했어요.","slots":[1]},{"id":4,"t":"say","who":"리브","text":"여기가 바로 장원 박물관, 015번 도시 지하철 11호선의 종착역이에요. 승격자의 흔적은 여기서 사라졌어요.","slots":[1]},{"id":5,"t":"sel","key":0,"opts":[{"text":"박물관?","to":6,"hx":6},{"text":"근처의 침식 상태는?","to":10,"hx":10}]},{"id":6,"t":"say","who":"리브","text":"네. 기록에 따르면 이곳은 황금시대에 대서양 경제 공동체에 속한 비즈니스 리더 한 사람의 개인 장원이었대요.","slots":[1]},{"id":7,"t":"say","who":"리브","text":"이분은 수집이 취미였는데, 특히 기계(로봇) 생체공학 생물을 즐겨 모았대요. 소장품이 가득한 이 장원을 박물관으로 삼아 시민들에게 공개했었대요.","slots":[1]},{"id":8,"t":"appear","slot":1,"role":"1011001","face":null,"x":0},{"id":9,"next":14,"t":"say","who":"리","text":"저도 그 역사는 들은 적이 있습니다. 황금시대에는 이미 꽤 발달한 생체공학 기술로 온갖 동물을 복원하는 게 유행했다고 하죠.","slots":[1]},{"id":10,"t":"say","who":"리브","text":"지휘관님께 보고드립니다. 역대 세계 퍼니싱 농도 분포 지도에 따르면, 이 구역은 오랫동안 중하급 침식 상태였습니다.","slots":[1]},{"id":11,"t":"say","who":"리브","text":"방금 스캔한 결과로도, 근처에서 활동 중인 침식체는 적은 편입니다.","slots":[1]},{"id":12,"t":"appear","slot":1,"role":"1011001","face":null,"x":0},{"id":13,"t":"say","who":"리","text":"\"적군의 근거지\"처럼 보이지는 않네요.","slots":[1]},{"id":14,"t":"appear","slot":1,"role":"1031001","face":null,"x":0},{"id":15,"t":"say","who":"리브","text":"이 장원 박물관은 면역 시대부터 퍼니싱에 대비해 전면적인 업그레이드를 거쳤고, 대피 시설로서 \"대철수\" 작전이 끝날 때까지 버텨 냈어요.","slots":[1]},{"id":16,"t":"appear","slot":1,"role":"1021001","face":null,"x":0},{"id":17,"t":"say","who":"루시아","text":"015번 도시보다 침식 정도가 더 낮은 것 같은데요. 하지만 선발 부대가 구조 신호를 보냈잖아요. 여기엔 침식체 말고 다른 적군이 있을지도 몰라요...","slots":[1]},{"id":18,"end":1,"ea":"AniZhuanchangBegin","t":"say","who":"루시아","text":"승격자들은 지금까지 실력을 드러낸 적이 없어요. 각별히 조심하죠.","slots":[1]}],"label":"3-2 종점"},{"id":"zx00303ba","title":"3-3 직감 계열","acts":[{"id":1,"ba":"AniZhuanchangEnd","t":"bg","src":"../assets/image/bgstory/bgstory19.webp","cg":false},{"id":100,"t":"bgm","src":"../assets/audio/m_avg_spaceship/m_avg_spaceship.mp3"},{"id":2,"t":"appear","slot":1,"role":"1031001","face":7,"x":0},{"id":3,"ba":"DialogEnable","t":"say","who":"리브","text":"루시아, 조심해요!","slots":[1]},{"id":4,"t":"appear","slot":1,"role":"1021001","face":null,"x":0},{"id":5,"ba":"RImgBg1Shake","t":"say","who":"루시아","text":"！","slots":[1]},{"id":6,"t":"say","who":"","text":"루시아의 뒤편에 있던 자율 경비병의 대포가 에너지 충전을 마쳤다.","slots":[]},{"id":7,"t":"face","slot":1,"face":9},{"id":8,"ba":"RImgBg1Shake","t":"say","who":"루시아","text":"(느, 늦었어!)","slots":[1]},{"id":9,"t":"say","who":"","text":"바로 그때, 대검 한 자루가 바람을 가르며 날아와——","slots":[]},{"id":10,"t":"say","who":"","text":"적의 몸체를 박살 냈다.","slots":[]},{"id":11,"t":"face","slot":1,"face":null},{"id":12,"t":"say","who":"루시아","text":"？","slots":[1]},{"id":13,"t":"appear","slot":1,"role":"1081001","face":1,"x":0},{"id":101,"t":"bgm","src":"../assets/audio/m_avg_general/m_avg_general.mp3"},{"id":14,"t":"say","who":"카무이!","text":"헤헷! 내가 타이밍에 딱 맞게 도착했네.","slots":[1]},{"id":15,"t":"say","who":"카무이","text":"너희 쪽에서 소리가 들려서 겨우 방향을 잡았어. 역시 직감이 제일 믿을 만하다니까! 너 괜찮아?","slots":[1]},{"id":16,"t":"shift","slot":1,"x":400,"dur":0.25},{"id":17,"t":"appear","slot":2,"role":"1021001","face":null,"x":-400},{"id":18,"t":"say","who":"루시아","text":"괜찮아요. 도와줘서 고마워요...","slots":[2]},{"id":19,"t":"say","who":"루시아","text":"그런데 누구세요?","slots":[2]},{"id":20,"t":"say","who":"카무이","text":"엥, 루시아, 나 기억 안 나? 입대할 때 만났잖아!","slots":[1]},{"id":21,"t":"say","who":"카무이","text":"근데 너, 그때보다 훨씬 기운 있어 보인다!","slots":[1]},{"id":22,"t":"say","who":"루시아","text":"……","slots":[2]},{"id":23,"t":"hide","slots":[1,2]},{"id":24,"t":"appear","slot":1,"role":"1011001","face":10,"x":0},{"id":25,"t":"say","who":"리","text":"소개팅 요청 신호가 아닌 지원 요청 신호를 보냈습니다. 우선 적군을 처치하고 인사를 나누시죠.","slots":[1]},{"id":26,"t":"appear","slot":1,"role":"1081001","face":1,"x":0},{"id":27,"t":"say","who":"카무이","text":"그래~ 그래~","slots":[1]},{"id":28,"t":"face","slot":1,"face":2},{"id":29,"end":1,"ea":"AniZhuanchangBegin","t":"say","who":"카무이","text":"그럼 내가 간다!","slots":[1]}],"label":"3-3 직감 계열"},{"id":"zx00304ba","title":"3-4 도움의 기쁨","acts":[{"id":1,"ba":"AniZhuanchangEnd","t":"bg","src":"../assets/image/bgstory/bgstory19.webp","cg":false},{"id":100,"t":"bgm","src":"../assets/audio/m_avg_general/m_avg_general.mp3"},{"id":2,"t":"appear","slot":1,"role":"1081001","face":1,"x":0},{"id":3,"ba":"DialogEnable","t":"say","who":"카무이","text":"다른 사람을 도와주는 기분은 정말 최고야!","slots":[1]},{"id":4,"t":"appear","slot":1,"role":"1011001","face":10,"x":0},{"id":5,"t":"say","who":"리","text":"등 뒤에...","slots":[1]},{"id":6,"t":"appear","slot":1,"role":"1081001","face":null,"x":0},{"id":7,"t":"say","who":"카무이","text":"이것 봐라? 아직 안 죽었네?","slots":[1]},{"id":8,"t":"hide","slots":[1]},{"id":9,"ba":"RImgBg1Shake","t":"say","who":"자율 경비병","text":"！","slots":[]},{"id":10,"ba":"RImgBg1Shake","t":"say","who":"자율 경비병","text":"스슥!!!","slots":[]},{"id":11,"t":"appear","slot":1,"role":"1011001","face":10,"x":0},{"id":12,"t":"say","who":"리","text":"해결했습니다.","slots":[1]},{"id":13,"t":"face","slot":1,"face":null},{"id":14,"t":"shift","slot":1,"x":-400,"dur":0.25},{"id":15,"t":"appear","slot":2,"role":"1081001","face":1,"x":400},{"id":16,"t":"say","who":"카무이","text":"휴~ 고마워! 손 한번 진짜 빠르네!","slots":[2]},{"id":17,"t":"say","who":"리","text":"(적군을 철저히 제거했는지 확인도 안 하고 등을 돌리다니... 왠지 모르게 이 녀석은 처음 본 순간부터 마음에 안 들어...)","slots":[1]},{"id":18,"t":"say","who":"카무이","text":"그레이 레이븐 소대 여러분, 안녕! 난 카무이라고 해. 아머형이고 차징 팔콘 소대의 멤버야.","slots":[2]},{"id":19,"t":"say","who":"카무이","text":"여기서 내 임무는 승격자 중 한 명을 추적하는 거야.","slots":[2]},{"id":20,"t":"say","who":"리","text":"그중의 한 명이라고요? 그럼 여러 명이 있다는 건가요?","slots":[1]},{"id":21,"t":"face","slot":2,"face":null},{"id":22,"t":"say","who":"카무이","text":"응. 우리가 얻은 정보로는, 놈들이 무슨 \"승격 네트워크\"라는 걸 쓰는 것 같아. 그걸로 엄청 강한 힘을 나눠 가질 수 있는데, 그 핵심 멤버를 \"승격자\"라고 부른대.","slots":[2]},{"id":23,"t":"appear","slot":1,"role":"1021001","face":3,"x":-400},{"id":24,"t":"say","who":"루시아","text":"추적하던 승격자는 어떻게 생겼어요? 혹시... 붉은 옷에 길고 흰 머리였나요?","slots":[1]},{"id":25,"t":"say","who":"카무이","text":"잘 모르겠는데. 근데 그걸 굳이 알아야 해?","slots":[2]},{"id":26,"t":"say","who":"루시아","text":"……","slots":[1]},{"id":27,"t":"appear","slot":1,"role":"1011001","face":10,"x":-400},{"id":28,"t":"say","who":"리","text":"...당신이 일하는 방식, 대충 알 것 같네요.","slots":[1]},{"id":29,"t":"appear","slot":1,"role":"1021001","face":null,"x":-400},{"id":30,"t":"say","who":"카무이","text":"그렇게 흉악한 녀석들은 딱 봐도 알아볼 수 있지!","slots":[2]},{"id":31,"end":1,"ea":"AniZhuanchangBegin","t":"say","who":"카무이","text":"자, 얘기는 여기까지. 같이 승격자를 끌어내자고!","slots":[2]}],"label":"3-4 도움의 기쁨"},{"id":"zx00305ba","title":"3-5 사택 난입","acts":[{"id":1,"ba":"AniZhuanchangEnd","t":"bg","src":"../assets/image/bgstory/bgstory.webp","cg":false},{"id":100,"t":"bgm","src":"../assets/audio/m_avg_general/m_avg_general.mp3"},{"id":2,"t":"appear","slot":1,"role":"1011001","face":null,"x":-400},{"id":3,"t":"appear","slot":2,"role":"1081001","face":null,"x":400},{"id":4,"ba":"DialogEnable","t":"say","who":"리","text":"계속 우리랑 함께 행동할 생각인가요?","slots":[1]},{"id":5,"t":"say","who":"카무이","text":"당연하지. 내가 저지른 실수는 내가 해결해야지.","slots":[2]},{"id":6,"t":"face","slot":1,"face":10},{"id":7,"t":"say","who":"리","text":"사고만 더 벌이지 않았으면 좋겠어요.","slots":[1]},{"id":8,"t":"say","who":"카무이","text":"말 한번 인정사정없네... 너 슬슬 싫어진다?","slots":[2]},{"id":9,"end":1,"ea":"AniZhuanchangBegin","t":"say","who":"리","text":"상관없어요.","slots":[1]}],"label":"3-5 사택 난입"},{"id":"zx00306ba","title":"3-6 함정 지옥","acts":[{"id":1,"ba":"AniZhuanchangEnd","t":"bg","src":"../assets/image/bgstory/bgstory6.webp","cg":false},{"id":100,"t":"bgm","src":"../assets/audio/m_avg_general/m_avg_general.mp3"},{"id":2,"ba":"DialogEnable","t":"say","who":"？？？","text":"저는 이 장원의 집사입니다.","slots":[]},{"id":3,"t":"say","who":"장원 집사","text":"저는 이 장원의 주인이신 카퍼필드(코브펠) 님을 도와, 그분의 가장 소중한 유산을 지키고 있습니다.","slots":[]},{"id":4,"t":"appear","slot":1,"role":"1081001","face":1,"x":0},{"id":5,"t":"say","who":"카무이","text":"안녕!","slots":[1]},{"id":6,"t":"appear","slot":1,"role":"1011001","face":null,"x":0},{"id":7,"t":"say","who":"리","text":"……","slots":[1]},{"id":8,"t":"appear","slot":1,"role":"1081001","face":1,"x":0},{"id":9,"t":"say","who":"장원 집사","text":"지금은 비밀 채널로 당신들과 통신하고 있습니다만, 경고를 드릴 기회는 많지 않습니다...","slots":[]},{"id":10,"t":"say","who":"장원 집사","text":"그러니 아직 늦지 않았을 때 이곳을 떠나십시오. 제 충고입니다...","slots":[]},{"id":11,"t":"face","slot":1,"face":null},{"id":12,"t":"say","who":"카무이","text":"그건 무리인데, 반드시 임무를 완료해야 떠날 수 있거든. 혹시 승격자가 어디에 있는지 알아?","slots":[1]},{"id":13,"t":"say","who":"장원 집사","text":"말씀해 드릴 수 없습니다.","slots":[]},{"id":14,"t":"say","who":"카무이","text":"그렇군. 그런데 왜 비밀 채널로 대화하는 거지?","slots":[1]},{"id":15,"t":"face","slot":1,"face":1},{"id":16,"t":"say","who":"카무이","text":"네가 침식체가 아니라면 나와 봐. 어쩌면 우리 친구가 될 수도 있잖아.","slots":[1]},{"id":17,"t":"face","slot":1,"face":null},{"id":18,"t":"say","who":"카무이","text":"이봐? 들려?","slots":[1]},{"id":19,"t":"appear","slot":1,"role":"1031001","face":null,"x":0},{"id":20,"t":"say","who":"리브","text":"카무이 님은 참...","slots":[1]},{"id":21,"t":"appear","slot":1,"role":"1011001","face":10,"x":0},{"id":22,"t":"say","who":"리","text":"단순하네요.","slots":[1]},{"id":23,"t":"appear","slot":1,"role":"1031001","face":null,"x":0},{"id":24,"t":"say","who":"리브","text":"에... 저기... 붙임성이 좋다고 하려던 거예요...","slots":[1]},{"id":25,"t":"appear","slot":1,"role":"1081001","face":null,"x":0},{"id":26,"t":"say","who":"카무이","text":"하아... 드디어 도와줄 사람을 구한 줄 알았는데...","slots":[1]},{"id":27,"t":"hide","slots":[1]},{"id":28,"t":"appear","slot":1,"role":"1021001","face":null,"x":-400},{"id":29,"t":"appear","slot":2,"role":"1011001","face":null,"x":400},{"id":30,"t":"say","who":"루시아","text":"지금은 원래 경로로 되돌아가 대문을 통과하는 수밖에 없어요.","slots":[1]},{"id":31,"end":1,"ea":"AniZhuanchangBegin","t":"say","who":"리","text":"잠금장치를 해킹할 수 있는지 해 보죠.","slots":[2]}],"label":"3-6 함정 지옥"},{"id":"zx00307ba","title":"3-7 마지막 경고","acts":[{"id":1,"ba":"AniZhuanchangEnd","t":"bg","src":"../assets/image/bgstory/bgstory7.webp","cg":false},{"id":100,"t":"bgm","src":"../assets/audio/m_avg_general/m_avg_general.mp3"},{"id":2,"t":"appear","slot":1,"role":"1031001","face":null,"x":0},{"id":3,"ba":"DialogEnable","t":"say","who":"리브","text":"경로 안내에 따르면, 여기를 지나면 아트리움이에요. 장원의 핵심 구역이고, 선발 소대가 가장 깊이 들어간 곳이에요.","slots":[1]},{"id":101,"t":"se","src":"../assets/audio/c_karenrk2/c_karenrk2_ultimate_explo.mp3"},{"id":4,"ba":"RImgBg1Shake","t":"say","who":"","text":"쾅!!!","slots":[]},{"id":5,"t":"shift","slot":1,"x":400,"dur":0.25},{"id":6,"t":"appear","slot":2,"role":"1021001","face":null,"x":-400},{"id":7,"t":"say","who":"루시아","text":"장원의 다른 곳에서 전투가 일어나고 있어요.","slots":[2]},{"id":8,"t":"say","who":"리브","text":"지휘관님, 아트리움에서 수많은 아군 구조체의 신호를 발견했습니다!","slots":[1]},{"id":9,"t":"say","who":"리브","text":"다들... 아주 강력한 침식체 하나와 싸우고 있어요. 티파보다도 훨씬... 아니, 아예 급이 달라요...","slots":[1]},{"id":10,"t":"appear","slot":1,"role":"1011001","face":null,"x":400},{"id":11,"t":"say","who":"리","text":"분명 승격자겠죠.","slots":[1]},{"id":12,"t":"say","who":"루시아","text":"티파와의 전투를 경험하고 우리 실력도 많이 늘었잖아요.","slots":[2]},{"id":13,"t":"say","who":"루시아","text":"게다가 이렇게 많은 동료가 있으니까, 이번 임무도 반드시 해낼 수 있어요.","slots":[2]},{"id":14,"t":"appear","slot":1,"role":"1081001","face":1,"x":400},{"id":15,"t":"say","who":"카무이","text":"루시아, 넌 여전히 기세가 대단하네! 훈련받던 그때랑 똑같아!","slots":[1]},{"id":16,"t":"say","who":"루시아","text":"훈련받을 때요? 그때 일은 기억이 잘 안 나네요.","slots":[2]},{"id":102,"t":"face","slot":1,"face":null},{"id":17,"t":"say","who":"카무이","text":"건망증이 있는 것 같지는 않았는데.","slots":[1]},{"id":18,"t":"say","who":"카무이","text":"그래... 날 잊어버리다니. 참 씁쓸하네...","slots":[1]},{"id":19,"end":1,"ea":"AniZhuanchangBegin","t":"say","who":"루시아","text":"……","slots":[2]}],"label":"3-7 마지막 경고"},{"id":"zx00308ba","title":"3-8 행동은 신중히","acts":[{"id":1,"ba":"AniZhuanchangEnd","t":"bg","src":"../assets/image/bgstory/bgstory15.webp","cg":false},{"id":100,"t":"bgm","src":"../assets/audio/m_avg_general/m_avg_general.mp3"},{"id":2,"t":"appear","slot":1,"role":"1021001","face":null,"x":0},{"id":3,"ba":"DialogEnable","t":"say","who":"루시아","text":"아트리움에 도착했습니다. 구조체 소대는 바로 계단 위쪽에 있습니다!","slots":[1]},{"id":4,"t":"appear","slot":1,"role":"1081001","face":1,"x":0},{"id":5,"t":"say","who":"카무이","text":"이렇게 넓은 공간이 있다니.","slots":[1]},{"id":6,"t":"appear","slot":1,"role":"1031001","face":null,"x":0},{"id":7,"t":"say","who":"리브","text":"전투가 이미 끝난 것 같은데요. 전원 생존인데 왜 저희 호출에 응답하지 않는 걸까요?","slots":[1]},{"id":8,"t":"appear","slot":1,"role":"1021001","face":3,"x":0},{"id":9,"end":1,"ea":"AniZhuanchangBegin","t":"say","who":"루시아","text":"잘 모르겠어요. 일단 이 아트리움을 통과하고 봐요.","slots":[1]}],"label":"3-8 행동은 신중히"},{"id":"zx00309ba","title":"3-9 특공 임무","acts":[{"id":1,"ba":"AniZhuanchangEnd","t":"bg","src":"../assets/image/bgstory/bgstory15.webp","cg":false},{"id":100,"t":"bgm","src":"../assets/audio/m_nbat_nsneaking/m_nbat_nsneaking.mp3"},{"id":2,"t":"appear","slot":1,"role":"1011001","face":null,"x":0},{"id":3,"ba":"DialogEnable","t":"say","who":"리","text":"잠깐만요. 아트리움 뒤쪽 구간에 적군이 아주 많이 몰려 있어요.","slots":[1]},{"id":4,"t":"say","who":"리","text":"지금 인원이 한꺼번에 지나가면, 전자 위장이 있어도 들켜서 포위당할 가능성이 커요.","slots":[1]},{"id":5,"t":"say","who":"리","text":"그렇다고 따로 움직이면, 들켰을 때 제때 서로 도울 수 없을지도 모르고요.","slots":[1]},{"id":6,"t":"appear","slot":1,"role":"1031001","face":null,"x":0},{"id":7,"t":"say","who":"리브","text":"그럼... 어떻게 해야 좋을까요?","slots":[1]},{"id":8,"t":"appear","slot":1,"role":"1011001","face":null,"x":0},{"id":9,"t":"say","who":"리","text":"이론적으로는 에너지 출력을 정확하게 통제하면 전자 위장 효력을 유지하면서도 적군을 파괴할 수 있어요.","slots":[1]},{"id":10,"t":"say","who":"리","text":"이 일은 전투 기술이 뛰어난 한 사람이 혼자 해내야 합니다.","slots":[1]},{"id":11,"t":"shift","slot":1,"x":-400,"dur":0.25},{"id":12,"t":"appear","slot":2,"role":"1081001","face":null,"x":400},{"id":13,"t":"say","who":"카무이","text":"나! 내가 출전할게!","slots":[2]},{"id":14,"t":"face","slot":1,"face":10},{"id":15,"t":"say","who":"리","text":"당신 무기에서 나는 소음이 워낙 커서 진동만으로도 적군에게 발각될 수 있어요.","slots":[1]},{"id":101,"t":"face","slot":1,"face":null},{"id":16,"t":"say","who":"카무이","text":"에휴.","slots":[2]},{"id":17,"t":"hide","slots":[2]},{"id":18,"t":"shift","slot":1,"x":0,"dur":0.25},{"id":19,"t":"say","who":"리","text":"저와 리브는 무기 에너지 출력이 너무 커서 이 임무에 적합한 편은 아닙니다.","slots":[1]},{"id":20,"t":"say","who":"리","text":"소리 없이 적군을 쓰러뜨릴 수 있는 무기와 전투 기술을 가진 건 루시아뿐이에요.","slots":[1]},{"id":21,"t":"appear","slot":1,"role":"1081001","face":null,"x":0},{"id":22,"t":"say","who":"카무이","text":"맞아!","slots":[1]},{"id":23,"t":"appear","slot":1,"role":"1021001","face":null,"x":0},{"id":24,"t":"say","who":"루시아","text":"준비됐습니다.","slots":[1]},{"id":25,"t":"appear","slot":1,"role":"1011001","face":null,"x":0},{"id":26,"t":"say","who":"리","text":"그럼 부탁할게요, 루시아.","slots":[1]},{"id":27,"t":"appear","slot":1,"role":"1031001","face":null,"x":0},{"id":28,"t":"say","who":"리브","text":"조심하세요.","slots":[1]},{"id":29,"t":"appear","slot":1,"role":"1021001","face":null,"x":0},{"id":30,"end":1,"ea":"AniZhuanchangBegin","t":"say","who":"루시아","text":"네, 걱정하지 마세요.","slots":[1]}],"label":"3-9 특공 임무"},{"id":"zx00310ba","title":"3-10 왜곡 개조","acts":[{"id":1,"ba":"AniZhuanchangEnd","t":"bg","src":"../assets/image/bgstory/bgstory15.webp","cg":false},{"id":100,"t":"bgm","src":"../assets/audio/m_avg_spaceship/m_avg_spaceship.mp3"},{"id":2,"t":"appear","slot":1,"role":"1011001","face":null,"x":400},{"id":3,"t":"appear","slot":2,"role":"1031001","face":7,"x":-400},{"id":4,"ba":"DialogEnable","t":"say","who":"리브","text":"계단 위쪽이 너무 조용해요.","slots":[2]},{"id":5,"t":"face","slot":1,"face":10},{"id":101,"t":"face","slot":2,"face":null},{"id":6,"t":"say","who":"리","text":"...또 그 익숙하고 불길한 예감이 드네요.","slots":[1]},{"id":7,"t":"face","slot":1,"face":null},{"id":8,"t":"say","who":"리","text":"피닉스 소대가 어떻게 당했는지 기억하죠?","slots":[1]},{"id":9,"t":"appear","slot":2,"role":"1081001","face":null,"x":-400},{"id":10,"t":"say","who":"카무이","text":"피닉스 소대? 아, 기록에 적혀있던 승격자한테 파괴당한 그...","slots":[2]},{"id":11,"t":"say","who":"리","text":"그 승격자는 저희 구조체의 신체 구조를 훤히 알고 있어요. 몸의 각 부위와 장비를 어떻게 부숴야 하는지도 잘 알고, 심지어 구조체를 특수 침식체(특별한 침식체)로 개조하는 능력까지 있죠.","slots":[1]},{"id":12,"t":"say","who":"리","text":"그렇다면 구조체를 완전히 부수지 않고 온갖 모습으로 바꿔서, 가짜 신호를 보내게 할 수도 있다는 거죠.","slots":[1]},{"id":13,"t":"say","who":"리","text":"그래서...","slots":[1]},{"id":14,"t":"say","who":"카무이","text":"그래서 뭐?","slots":[2]},{"id":15,"t":"face","slot":1,"face":10},{"id":16,"ea":"AniZhuanchangBegin","t":"say","who":"리","text":"이제부터 보게 될 것에... 마음의 준비를 해 두는 게 좋을 거예요.","slots":[1]},{"id":17,"t":"hide","slots":[1,2]},{"id":18,"t":"bg","src":"../assets/image/bgstory/bgstory22.webp","cg":false},{"id":19,"t":"appear","slot":1,"role":"1021001","face":null,"x":0},{"id":20,"ba":"AniZhuanchangEnd","t":"say","who":"루시아","text":"도착했습니다.","slots":[1]},{"id":21,"t":"say","who":"루시아","text":"적군은 발견하지 못했고 전부 구조체입니다.","slots":[1]},{"id":22,"t":"appear","slot":1,"role":"500019","face":null,"x":0},{"id":23,"t":"say","who":"구조체 병사","text":"……","slots":[1]},{"id":24,"t":"appear","slot":1,"role":"1021001","face":null,"x":0},{"id":25,"t":"say","who":"루시아","text":"다들 살아있습니다. 침식되지도 않았습니다.","slots":[1]},{"id":26,"t":"appear","slot":1,"role":"1081001","face":null,"x":0},{"id":27,"t":"say","who":"카무이","text":"그런데 왜 아무도 말을 안 하는 거야?","slots":[1]},{"id":28,"t":"appear","slot":1,"role":"1011001","face":null,"x":0},{"id":29,"t":"say","who":"리","text":"루시아, 신중하게 움직여요.","slots":[1]},{"id":30,"t":"appear","slot":1,"role":"1021001","face":null,"x":0},{"id":31,"end":1,"ea":"AniZhuanchangBegin","t":"say","who":"루시아","text":"네...","slots":[1]}],"label":"3-10 왜곡 개조"},{"id":"zx00311ba","title":"3-11 각자의 충성","acts":[{"id":1,"ba":"AniZhuanchangEnd","t":"bg","src":"../assets/image/bgstory/bgstory24.webp","cg":false},{"id":100,"t":"bgm","src":"../assets/audio/m_avg_spaceship/m_avg_spaceship.mp3"},{"id":2,"t":"appear","slot":1,"role":"500008","face":null,"x":0},{"id":3,"ba":"DialogEnable","t":"say","who":"롤랑","text":"다들 안녕. 드디어 만났네.","slots":[1]},{"id":4,"t":"shift","slot":1,"x":400,"dur":0.25},{"id":5,"t":"appear","slot":2,"role":"1081001","face":5,"x":-400},{"id":6,"t":"say","who":"카무이","text":"너였어...","slots":[2]},{"id":7,"t":"say","who":"카무이","text":"내가 계속 쫓던 승격자가 너였어?!","slots":[2]},{"id":8,"t":"say","who":"롤랑","text":"맞아.","slots":[1]},{"id":9,"t":"say","who":"카무이","text":"난... 널 좋은 사람이라고 생각했는데.","slots":[2]},{"id":10,"t":"say","who":"롤랑","text":"하하.","slots":[1]},{"id":11,"t":"say","who":"롤랑","text":"정말 아쉽네.","slots":[1]},{"id":12,"t":"say","who":"롤랑","text":"그래도 난 너처럼 선악을 단순하게 나누는 사람, 싫지 않아.","slots":[1]},{"id":13,"t":"say","who":"롤랑","text":"퍼니싱만 아니었다면 친하게 지냈을지도 모르지...","slots":[1]},{"id":14,"t":"say","who":"카무이","text":"쓸데없는 소리 하지 마!","slots":[2]},{"id":15,"t":"say","who":"카무이","text":"네가 바로 이 모든 일의 원흉이었어!","slots":[2]},{"id":16,"ba":"RImgBg1Shake","t":"say","who":"","text":"카무이가 앞으로 뛰어들어, 롤랑에게 묵직한 일격을 날렸다.","slots":[]},{"id":17,"t":"hide","slots":[1]},{"id":18,"t":"say","who":"","text":"하지만 롤랑은 그 일격을 손쉽게 피했다.","slots":[]},{"id":19,"t":"hide","slots":[2]},{"id":20,"t":"appear","slot":1,"role":"500008","face":null,"x":0},{"id":21,"t":"say","who":"롤랑","text":"네 실력이 고작 이 정도야? 카무이?","slots":[1]},{"id":22,"t":"appear","slot":1,"role":"1081001","face":5,"x":0},{"id":23,"t":"say","who":"카무이","text":"젠장... 처음엔 왜 몰랐던 걸까...","slots":[1]},{"id":24,"t":"shift","slot":1,"x":-400,"dur":0.25},{"id":25,"t":"appear","slot":2,"role":"500008","face":null,"x":400},{"id":26,"t":"say","who":"롤랑","text":"그야 네가 너무 단순했으니까, 바보야.","slots":[2]},{"id":27,"t":"say","who":"카무이","text":"더는 네가 다른 사람을 해치게 두지 않겠어!","slots":[1]},{"id":28,"t":"hide","slots":[1,2]},{"id":29,"t":"appear","slot":1,"role":"1021001","face":null,"x":0},{"id":30,"ba":"RImgBg1Shake","t":"say","who":"루시아","text":"카무이! 혼자서는...","slots":[1]},{"id":31,"t":"appear","slot":1,"role":"500008","face":null,"x":0},{"id":32,"t":"say","who":"롤랑","text":"진정해, 그레이 레이븐 소대!","slots":[1]},{"id":33,"t":"say","who":"롤랑","text":"이건 나와... 음, 이 녀석 사이의 개인적인 원한이니까...","slots":[1]},{"id":34,"t":"appear","slot":1,"role":"1081001","face":5,"x":0},{"id":35,"t":"say","who":"카무이","text":"너 지금 내 이름 잊어버렸지!","slots":[1]},{"id":36,"t":"appear","slot":1,"role":"500008","face":null,"x":0},{"id":37,"t":"say","who":"롤랑","text":"하하...","slots":[1]},{"id":38,"ba":"RImgBg1Shake","t":"say","who":"","text":"롤랑은 여유롭게 카무이의 공격을 받아내면서 그레이 레이븐 소대와 대화했다.","slots":[]},{"id":39,"t":"say","who":"롤랑","text":"너희들, 아직 이 친구와 인사도 안 했지?","slots":[1]},{"id":40,"t":"say","who":"롤랑","text":"내가 퍼니싱을 너무 많이 주입해서 지금 너희들 말이 들리진 않겠지만 말이야.","slots":[1]},{"id":41,"end":1,"ea":"AniZhuanchangBegin","t":"say","who":"롤랑","text":"집 지키는 개 주제에 제 구실도 이렇게 못 하다니. 괜히 기대만 했잖아...","slots":[1]}],"label":"3-11 각자의 충성"},{"id":"zx00312ba","title":"3-12 새로운 씨앗","acts":[{"id":1,"ba":"AniZhuanchangEnd","t":"bg","src":"../assets/image/bgstory/bgstory24.webp","cg":false},{"id":100,"t":"bgm","src":"../assets/audio/m_avg_spaceship/m_avg_spaceship.mp3"},{"id":2,"ba":"DialogEnable","t":"say","who":"장원 집사","text":"윽...","slots":[]},{"id":3,"t":"appear","slot":1,"role":"500008","face":null,"x":0},{"id":4,"t":"say","who":"롤랑","text":"힘이 다 빠진 거야?","slots":[1]},{"id":5,"t":"say","who":"롤랑","text":"뭐, 무명씨치고는 제법 잘 버틴 편이네.","slots":[1]},{"id":6,"t":"say","who":"롤랑","text":"죽은 충견이야말로 좋은 충견인 법이지...","slots":[1]},{"id":7,"t":"appear","slot":1,"role":"1081001","face":5,"x":0},{"id":8,"t":"say","who":"카무이","text":"후... 후...","slots":[1]},{"id":9,"t":"appear","slot":1,"role":"1021001","face":null,"x":0},{"id":10,"t":"say","who":"루시아","text":"카무이!","slots":[1]},{"id":11,"t":"appear","slot":1,"role":"1081001","face":5,"x":0},{"id":12,"t":"say","who":"카무이","text":"괜찮아... 난 그냥...","slots":[1]},{"id":13,"t":"appear","slot":1,"role":"500008","face":null,"x":0},{"id":14,"t":"say","who":"롤랑","text":"넌 그냥 푹 쉬고 있어.","slots":[1]},{"id":15,"t":"say","who":"롤랑","text":"흥.","slots":[1]},{"id":16,"t":"say","who":"","text":"롤랑은 숨을 헐떡이는 카무이를 의미심장하게 힐끗 쳐다보았다.","slots":[]},{"id":17,"end":1,"ea":"AniZhuanchangBegin","t":"say","who":"롤랑","text":"그럼... 출전 상대를 교체해 볼까?","slots":[1]}],"label":"3-12 새로운 씨앗 (전투 전)"},{"id":"zx00312ea","title":"3-12 새로운 씨앗","acts":[{"id":1,"ba":"AniZhuanchangEnd","t":"bg","src":"../assets/image/bgstory/bgstory24.webp","cg":false},{"id":100,"ea":"DialogEnable","t":"bgm","src":"../assets/audio/m_avg_spaceship/m_avg_spaceship.mp3"},{"id":2,"ba":"RImgBg1Shake","t":"say","who":"","text":"홀이 쉴 새 없이 흔들리고, 무수한 파편이 쏟아져 내렸다.","slots":[]},{"id":3,"t":"appear","slot":1,"role":"1081001","face":null,"x":0},{"id":4,"t":"say","who":"카무이","text":"날 구석에 두고 방심하다니, 참 바보라니까!","slots":[1]},{"id":5,"t":"appear","slot":1,"role":"500008","face":null,"x":0},{"id":6,"t":"say","who":"롤랑","text":"그런가? 설마 아직도 눈치채지 못한 거야? 처음부터 내 목표는 카무이 너였다는 걸 말이야.","slots":[1]},{"id":7,"t":"appear","slot":1,"role":"1021001","face":null,"x":0},{"id":8,"t":"say","who":"루시아","text":"아니, 이건...","slots":[1]},{"id":9,"t":"appear","slot":1,"role":"500008","face":null,"x":0},{"id":10,"t":"say","who":"","text":"롤랑은 무기를 휘둘러 주변 기둥을 전부 부숴 버렸다.","slots":[]},{"id":11,"t":"hide","slots":[1]},{"id":12,"t":"say","who":"","text":"거대한 바위가 그레이 레이븐 소대와 롤랑 사이에 떨어져 소대의 동선과 시야를 막아버렸다.","slots":[]},{"id":13,"t":"appear","slot":1,"role":"1021001","face":null,"x":0},{"id":14,"t":"say","who":"루시아","text":"카무이! 그쪽 상황은...","slots":[1]},{"id":15,"t":"appear","slot":1,"role":"1081001","face":5,"x":0},{"id":16,"t":"say","who":"카무이","text":"다들 어서 철수해!","slots":[1]},{"id":17,"t":"fx","path":"FxUiStoryGanRanNew.prefab","slot":1},{"id":18,"t":"say","who":"카무이","text":"으윽!","slots":[1]},{"id":19,"t":"nop"},{"id":20,"t":"appear","slot":1,"role":"1011001","face":null,"x":0},{"id":21,"t":"say","who":"리","text":"지금 철수하라는 말이나 할 때가 아니잖아요!","slots":[1]},{"id":22,"t":"say","who":"리","text":"카무이, 거기서 대체 무슨 일이 일어나고 있는 거예요!?","slots":[1]},{"id":23,"t":"hide","slots":[1]},{"id":24,"t":"say","who":"","text":"통신 접속 중...","slots":[]},{"id":25,"t":"appear","slot":1,"role":"500007","face":null,"x":0},{"id":26,"t":"fx","path":"FxUiStoryTongxunHalfNew.prefab","slot":1},{"id":27,"t":"say","who":"크롬","text":"카무이! 네 침식 정도가 급격하게 상승하고 있어!","slots":[1]},{"id":28,"t":"say","who":"크롬","text":"그쪽에서 무슨 일이 벌어진 거야!","slots":[1]},{"id":29,"t":"nop"},{"id":30,"t":"appear","slot":1,"role":"1081001","face":5,"x":0},{"id":31,"t":"fx","path":"FxUiStoryGanRanNew.prefab","slot":1},{"id":32,"t":"say","who":"카무이","text":"대장... 내가...","slots":[1]},{"id":33,"t":"nop"},{"id":34,"t":"appear","slot":1,"role":"500007","face":null,"x":0},{"id":35,"t":"fx","path":"FxUiStoryTongxunHalfNew.prefab","slot":1},{"id":36,"t":"say","who":"크롬","text":"카무이!","slots":[1]},{"id":37,"end":1,"ea":"AniZhuanchangBegin","t":"say","who":"크롬","text":"젠장...","slots":[1]}],"label":"3-12 새로운 씨앗 (전투 후)"}],"roles":{"500008":{"name":"롤랑","img":"../assets/image/rolestory/luolannomal01.webp","w":1000,"h":1080,"box":[254,105,301,323],"faces":{"5":{"src":"../assets/image/rolestoryface/luolannomal01/luolannomal01_05.webp","w":351,"h":356}}},"1031001":{"name":"리브","img":"../assets/image/rolestory/lifunormal01.webp","w":1000,"h":1080,"box":[415,302,262,242],"faces":{"1":{"src":"../assets/image/rolestoryface/r1lifunormal01/r1lifunormal01_01.webp","w":262,"h":244},"2":{"src":"../assets/image/rolestoryface/r1lifunormal01/r1lifunormal01_02.webp","w":262,"h":244},"3":{"src":"../assets/image/rolestoryface/r1lifunormal01/r1lifunormal01_03.webp","w":262,"h":244},"7":{"src":"../assets/image/rolestoryface/r1lifunormal01/r1lifunormal01_07.webp","w":262,"h":244},"9":{"src":"../assets/image/rolestoryface/r1lifunormal01/r1lifunormal01_09.webp","w":262,"h":244},"10":{"src":"../assets/image/rolestoryface/r1lifunormal01/r1lifunormal01_10.webp","w":262,"h":244}}},"1011001":{"name":"리","img":"../assets/image/rolestory/liangnomal01.webp","w":1000,"h":1080,"box":[413,235,249,215],"faces":{"1":{"src":"../assets/image/rolestoryface/liangnomal01/liangnomal01_06.webp","w":263,"h":216},"2":{"src":"../assets/image/rolestoryface/liangnomal01/liangnomal01_06.webp","w":263,"h":216},"3":{"src":"../assets/image/rolestoryface/liangnomal01/liangnomal01_06.webp","w":263,"h":216},"5":{"src":"../assets/image/rolestoryface/liangnomal01/liangnomal01_06.webp","w":263,"h":216},"7":{"src":"../assets/image/rolestoryface/liangnomal01/liangnomal01_06.webp","w":263,"h":216},"9":{"src":"../assets/image/rolestoryface/liangnomal01/liangnomal01_09.webp","w":263,"h":216},"10":{"src":"../assets/image/rolestoryface/liangnomal01/liangnomal01_10.webp","w":263,"h":216}}},"1021001":{"name":"루시아","img":"../assets/image/rolestory/luxiyanormal01.webp","w":1000,"h":1080,"box":[456,302,213,190],"faces":{"1":{"src":"../assets/image/rolestoryface/luxiyanormal01/luxiyanormal01_01.webp","w":213,"h":190},"2":{"src":"../assets/image/rolestoryface/luxiyanormal01/luxiyanormal01_01.webp","w":213,"h":190},"3":{"src":"../assets/image/rolestoryface/luxiyanormal01/luxiyanormal01_03.webp","w":213,"h":190},"5":{"src":"../assets/image/rolestoryface/luxiyanormal01/luxiyanormal01_01.webp","w":213,"h":190},"7":{"src":"../assets/image/rolestoryface/luxiyanormal01/luxiyanormal01_01.webp","w":213,"h":190},"9":{"src":"../assets/image/rolestoryface/luxiyanormal01/luxiyanormal01_09.webp","w":213,"h":190},"10":{"src":"../assets/image/rolestoryface/luxiyanormal01/luxiyanormal01_01.webp","w":213,"h":190}}},"1081001":{"name":"카무이","img":"../assets/image/rolestory/shenweinormal01.webp","w":1000,"h":1080,"box":[361,61,290,374],"faces":{"1":{"src":"../assets/image/rolestoryface/shenweinormal01/shenweinormal01_01.webp","w":361,"h":405},"2":{"src":"../assets/image/rolestoryface/shenweinormal01/shenweinormal01_02.webp","w":361,"h":405},"3":{"src":"../assets/image/rolestoryface/shenweinormal01/shenweinormal01_01.webp","w":361,"h":405},"5":{"src":"../assets/image/rolestoryface/shenweinormal01/shenweinormal01_05.webp","w":361,"h":405},"7":{"src":"../assets/image/rolestoryface/shenweinormal01/shenweinormal01_01.webp","w":361,"h":405},"9":{"src":"../assets/image/rolestoryface/shenweinormal01/shenweinormal01_01.webp","w":361,"h":405},"10":{"src":"../assets/image/rolestoryface/shenweinormal01/shenweinormal01_01.webp","w":361,"h":405}}},"500019":{"name":"공용 구조체","img":"../assets/image/rolestory/tongyonggouzaoti01nomal01.webp","w":1000,"h":1080,"box":[0,0,0,0],"faces":{}},"500007":{"name":"크롬","img":"../assets/image/rolestory/kuluomunomal01.webp","w":1000,"h":1080,"box":[0,0,0,0],"faces":{}}}};
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const store = {
+  get(k){ try{ return localStorage.getItem("pgrvn."+k) }catch(e){ return null } },
+  set(k,v){ try{ localStorage.setItem("pgrvn."+k, v) }catch(e){} },
+};
+const W = 1920, H = 1080;   // 연출 좌표계(가로 1920 기준, x=0이 가운데)
+
+let ep = 0, token = 0, waiting = null, typing = null, auto = false, cur = null, curChoice = null;
+let logs = [], actors = {}, mem = null, phase = "list", snapped = false;
+let soundOn = store.get("sound") !== "0", started = false, bgmSrc = null;
+const bgm = new Audio(); bgm.loop = true; bgm.preload = "auto";
+const trace = [];  // 확인용 기록(화면에 그린 상태)
+
+/* ---------- 소리 ---------- */
+function playBgm(src){
+  bgmSrc = src;
+  if(!soundOn || !started){ return; }
+  if(bgm.getAttribute("src") !== src){ bgm.setAttribute("src", src); }
+  const p = bgm.play(); if(p) p.catch(()=>{});
+}
+function playSe(src){
+  if(!soundOn || !started) return;
+  const a = new Audio(src); const p = a.play(); if(p) p.catch(()=>{});
+}
+function setSound(on){
+  soundOn = on; store.set("sound", on ? "1" : "0");
+  $("snd").setAttribute("aria-pressed", on); $("snd").textContent = on ? "소리 켬" : "소리 끔";
+  if(!on) bgm.pause(); else if(bgmSrc) playBgm(bgmSrc);
+}
+
+/* ---------- 화면 요소 ---------- */
+function setBg(a){
+  const img = $("bgimg");
+  img.setAttribute("src", a.src); img.alt = a.cg ? "이벤트 CG" : "배경";
+  $("bg").classList.remove("off");
+}
+function slotOf(n){
+  if(!actors[n]){
+    const el = document.createElement("div"); el.className = "actor"; el.dataset.slot = n;
+    el.innerHTML = `<img class="stand" alt=""><img class="face" alt="" hidden>`;
+    $("actors").appendChild(el);
+    actors[n] = {el, role:null, face:null, x:0};
+  }
+  return actors[n];
+}
+function drawActor(n){
+  const s = actors[n]; if(!s || !s.role) return;
+  const r = D.roles[s.role]; if(!r) return;
+  const el = s.el, st = el.querySelector(".stand"), fc = el.querySelector(".face");
+  el.style.width = (r.w / W * 100) + "%";
+  el.style.height = (r.h / H * 100) + "%";
+  el.style.left = ((W/2 + s.x - r.w/2) / W * 100) + "%";
+  el.style.zIndex = 2 + (+n);
+  if(st.getAttribute("src") !== r.img) st.setAttribute("src", r.img);
+  const f = s.face != null ? r.faces[String(s.face)] : null;
+  if(f){
+    const [bx, by, bw, bh] = r.box, cx = bx + bw/2, cy = by + bh/2;
+    fc.style.left = ((cx - f.w/2) / r.w * 100) + "%";
+    fc.style.top = ((cy - f.h/2) / r.h * 100) + "%";
+    fc.style.width = (f.w / r.w * 100) + "%";
+    fc.style.height = (f.h / r.h * 100) + "%";
+    if(fc.getAttribute("src") !== f.src) fc.setAttribute("src", f.src);
+    fc.hidden = false;
+  } else { fc.hidden = true; fc.removeAttribute("src"); }
+}
+function shake(el){ el.classList.remove("shake"); void el.offsetWidth; el.classList.add("shake"); }
+function flash(){ const f = $("flash"); f.classList.remove("go"); void f.offsetWidth; f.classList.add("go"); }
+
+async function anim(name){
+  if(name === "AniZhuanchangBegin"){ $("dialog").classList.add("hide"); $("fade").classList.add("on"); await sleep(380); }
+  else if(name === "AniZhuanchangEnd"){ $("fade").classList.remove("on"); await sleep(250); }
+  else if(name === "RImgBg1Shake") shake($("bg"));
+  else { const m = /^PanelActor(\d+)Shake$/.exec(name); if(m && actors[m[1]]) shake(actors[m[1]].el); }
+}
+// 대기: 시간이 지나거나 클릭하면 넘어간다
+function pause(ms){
+  return new Promise(res => {
+    const done = () => { clearTimeout(t); if(waiting && waiting.res === done) waiting = null; res(); };
+    const t = setTimeout(done, ms);
+    waiting = {kind:"delay", res:done};
+  });
+}
+
+/* ---------- 대사·선택지 ---------- */
+function snapshot(a){
+  const E = D.episodes[ep];
+  trace.push({ep:E.id, id:a.id, who:a.who, text:a.text, shown:$("text").textContent, name:$("name").textContent,
+    bg:$("bg").classList.contains("off") ? null : $("bgimg").getAttribute("src"), bgm:bgmSrc,
+    actors:Object.entries(actors).filter(([,s]) => s.el.classList.contains("on")).map(([n,s]) => ({slot:+n, role:s.role,
+      stand:s.el.querySelector(".stand").getAttribute("src"),
+      face:s.el.querySelector(".face").hidden ? null : s.el.querySelector(".face").getAttribute("src"),
+      dim:s.el.classList.contains("dim")}))});
+}
+function say(a){
+  cur = a; snapped = false; $("theme").classList.remove("on");
+  $("dialog").classList.remove("hide","ready");
+  const sp = (a.slots || []).map(String);
+  for(const [n,s] of Object.entries(actors))
+    s.el.classList.toggle("dim", !!a.who && sp.length > 0 && !sp.includes(n) && s.el.classList.contains("on"));
+  $("name").textContent = a.who; $("name").classList.toggle("empty", !a.who);
+  $("text").classList.toggle("narr", !a.who);
+  logs.push({kind:"say", a});
+  return new Promise(res => {
+    waiting = {kind:"click", res};
+    const chars = [...a.text]; let i = 0;
+    $("text").textContent = "";
+    const step = () => {
+      i += 1; $("text").textContent = chars.slice(0, i).join("");
+      if(i < chars.length) typing = setTimeout(step, 26); else doneTyping();
+    };
+    typing = setTimeout(step, 0);
+  });
+}
+function doneTyping(){
+  clearTimeout(typing); typing = null;
+  if(!cur) return;
+  $("text").textContent = cur.text; $("dialog").classList.add("ready");
+  if(!snapped){ snapped = true; snapshot(cur); }
+  if(auto && waiting && waiting.kind === "click"){
+    const w = waiting, n = [...cur.text].length;
+    setTimeout(() => { if(auto && waiting === w) advance(); }, 1000 + n * 45);
+  }
+}
+function choose(a){
+  curChoice = a; drawChoices(); phase = "choice";
+  return new Promise(res => { waiting = {kind:"choice", res}; });
+}
+function drawChoices(){
+  const box = $("choices"); box.innerHTML = "";
+  if(!curChoice){ box.classList.remove("on"); return; }
+  curChoice.opts.forEach((o, i) => {
+    const b = document.createElement("button");
+    b.innerHTML = `<b>${i+1}</b>${esc(o.text)}`;
+    b.onclick = e => { e.stopPropagation(); pick(i); };
+    box.appendChild(b);
+  });
+  box.classList.add("on");
+}
+function pick(i){
+  if(!waiting || waiting.kind !== "choice" || !curChoice.opts[i]) return;
+  const o = curChoice.opts[i], w = waiting;
+  logs.push({kind:"choice", o}); trace.push({ep:D.episodes[ep].id, choice:curChoice.id, pick:i});
+  waiting = null; curChoice = null; drawChoices(); phase = "play";
+  w.res(o.to);
+}
+function advance(){
+  if(typing){ doneTyping(); return; }
+  if(waiting && (waiting.kind === "click" || waiting.kind === "delay")){ const w = waiting; waiting = null; w.res(); }
+}
+
+/* ---------- 진행 ---------- */
+function resetStage(){
+  clearTimeout(typing); typing = null; waiting = null; cur = null; curChoice = null;
+  $("actors").innerHTML = ""; actors = {}; mem = null;
+  $("bg").classList.add("off"); $("fade").classList.add("on"); $("theme").classList.remove("on");
+  $("dialog").classList.add("hide"); $("choices").classList.remove("on"); $("title").classList.remove("on");
+}
+function card(html){
+  const t = $("title"); t.innerHTML = html; t.classList.add("on");
+  return new Promise(res => {
+    const go = v => { t.classList.remove("on"); res(v); };
+    t.querySelectorAll("button").forEach(b => b.onclick = e => {
+      e.stopPropagation(); if(waiting && waiting.res === go) waiting = null; go(b.dataset.go); });
+    waiting = {kind:"card", res:go};
+  });
+}
+function preload(E){
+  const seen = new Set();
+  const add = s => { if(s && !seen.has(s)){ seen.add(s); const i = new Image(); i.src = s; } };
+  for(const a of E.acts){
+    if(a.t === "bg") add(a.src);
+    if(a.t === "appear"){ const r = D.roles[a.role]; if(r){ add(r.img); Object.values(r.faces).forEach(f => add(f.src)); } }
+  }
+}
+async function run(){
+  const my = ++token; resetStage(); phase = "play";
+  const E = D.episodes[ep]; const idx = new Map(E.acts.map((a, i) => [a.id, i]));
+  drawHead(); store.set("last." + D.no, E.id); preload(E);
+  logs.push({kind:"sep", t:E.label});
+  trace.push({ep:E.id, start:1});
+  let pc = 0;
+  while(pc < E.acts.length){
+    const a = E.acts[pc];
+    trace.push({ep:E.id, act:a.id});
+    if(a.bd) await pause(a.bd);
+    const fadeIn = a.ba === "AniZhuanchangEnd";
+    if(a.ba && !fadeIn) await anim(a.ba);
+    if(my !== token) return;
+    let jump = null;
+    switch(a.t){
+      case "bg": setBg(a); break;
+      case "bgm": playBgm(a.src); break;
+      case "se": playSe(a.src); break;
+      case "appear": { const s = slotOf(a.slot);
+        s.role = a.role; s.face = a.face; s.x = a.x;
+        s.el.style.transition = "none"; drawActor(a.slot); void s.el.offsetWidth; s.el.style.transition = "";
+        s.el.classList.add("on"); s.el.classList.remove("dim"); break; }
+      case "hide": for(const n of a.slots) if(actors[n]) actors[n].el.classList.remove("on","dim"); break;
+      case "shift": { const s = actors[a.slot]; if(s){ s.x = a.x; s.el.style.transition = `left ${a.dur || 0}s ease, opacity .25s, filter .2s`;
+        drawActor(a.slot); } break; }
+      case "face": { const s = actors[a.slot]; if(s){ s.face = a.face; drawActor(a.slot); } break; }
+      case "say": if(fadeIn) $("fade").classList.remove("on"); await say(a); break;
+      case "sel": { const to = await choose(a);
+        if(a.key) mem = to; else jump = to; break; }   // 키가 있으면 기록만 하고 이어 감
+      case "recall": if(mem != null) jump = mem; break; // 기록한 선택으로 분기
+      case "theme": $("theme").innerHTML = `<div class="s">${esc(a.sub)}</div><div class="t">${esc(a.title)}</div><div class="l"></div>`;
+        $("theme").classList.add("on"); break;
+      case "anim": break;
+      case "fx": if(/Hit/i.test(a.path)){ flash(); if(actors[a.slot]) shake(actors[a.slot].el); } break;
+    }
+    if(my !== token) return;
+    if(fadeIn && a.t !== "say") await anim("AniZhuanchangEnd");
+    if(a.ed) await pause(a.ed);
+    if(a.t === "anim" && a.name === "ThemeEnable") $("theme").classList.remove("on");
+    if(a.ea) await anim(a.ea);
+    if(my !== token) return;
+    if(a.end) break;
+    const nid = jump ?? a.next;
+    pc = nid != null ? idx.get(nid) : pc + 1;
+    if(pc === undefined){ console.error("이동할 동작 없음", E.id, nid); break; }
+  }
+  if(my !== token) return;
+  trace.push({ep:E.id, done:1});
+  $("dialog").classList.add("hide"); $("fade").classList.add("on"); $("theme").classList.remove("on");
+  const last = ep >= D.episodes.length - 1;
+  phase = last ? "final" : "end";
+  const go = await card(last
+    ? `<div class="t1">${esc(E.label)}</div><div class="t2">${esc(D.title)}</div><div class="t3">끝</div>` +
+      `<div class="btns"><a class="btn" id="endtoc" href="../index.html">목차로</a><button data-go="list">편 목록</button></div>`
+    : `<div class="t1">${esc(E.label)}</div><div class="t2">끝</div>` +
+      `<div class="btns"><button data-go="next">다음 · ${esc(D.episodes[ep+1].label)}</button></div>`);
+  if(my !== token) return;
+  if(go === "list"){ showList(); return; }
+  ep += 1;
+  run();
+}
+
+/* ---------- 로그·설정 ---------- */
+function drawLog(){
+  $("logrows").innerHTML = logs.map(l => {
+    if(l.kind === "sep") return `<div class="row sep">— ${esc(l.t)} —</div>`;
+    if(l.kind === "choice") return `<div class="row ch">▶ ${esc(l.o.text)}</div>`;
+    return `<div class="row">${l.a.who ? `<b>${esc(l.a.who)}</b>` : ""}${esc(l.a.text)}</div>`;
+  }).join("");
+  const box = $("logrows").parentElement; box.scrollTop = box.scrollHeight;
+}
+function toggleLog(on){ $("log").classList.toggle("on", on); if(on) drawLog(); }
+
+function drawHead(){
+  const E = phase === "list" ? null : D.episodes[ep];
+  $("chap").innerHTML = esc(D.title) + (E ? `<small>${esc(E.label)}</small>` : "");
+}
+function drawList(){
+  const last = store.get("last." + D.no);
+  $("lgroup").textContent = "퍼니싱: 그레이 레이븐" + (D.group ? " · " + D.group : "");
+  $("ltitle").textContent = D.title;
+  $("lsub").textContent = `${D.episodes.length}편`;
+  $("eps").innerHTML = D.episodes.map((e, i) =>
+    `<li><button data-i="${i}"${e.id === last ? ' class="last" title="마지막으로 본 편"' : ""}><span class="no">${i+1}</span>` +
+    `<span>${esc(e.label)}</span></button></li>`).join("");
+  $("eps").querySelectorAll("button").forEach(b => b.onclick = () => startEp(+b.dataset.i));
+}
+function showList(){
+  token++; resetStage(); toggleLog(false);
+  bgm.pause(); bgmSrc = null; auto = false; $("auto").setAttribute("aria-pressed", false);
+  phase = "list"; document.body.classList.add("listing"); drawHead(); drawList(); window.scrollTo(0, 0);
+}
+// 편을 고르면 그 편부터 재생 — 소리는 이 클릭 뒤부터(브라우저 자동재생 제한)
+function startEp(i){
+  started = true; logs = []; ep = i; phase = "play";
+  document.body.classList.remove("listing"); window.scrollTo(0, 0); run();
+}
+document.title = `${D.title} · 퍼니싱 스토리 다시보기`;
+setSound(soundOn);
+$("listbtn").onclick = e => { e.currentTarget.blur(); showList(); };
+$("restart").onclick = e => { e.currentTarget.blur(); if(phase !== "list") run(); };
+$("auto").onclick = e => { auto = !auto; e.currentTarget.setAttribute("aria-pressed", auto); e.currentTarget.blur();
+  if(auto && !typing && waiting && waiting.kind === "click" && cur) doneTyping(); };
+$("snd").onclick = e => { e.currentTarget.blur(); setSound(!soundOn); };
+$("logbtn").onclick = e => { e.currentTarget.blur(); toggleLog(true); };
+$("logclose").onclick = () => toggleLog(false);
+$("log").onclick = e => { if(e.target.id === "log") toggleLog(false); };
+$("stage").onclick = () => advance();
+$("dialog").onclick = () => advance();
+document.addEventListener("keydown", e => {
+  if(phase === "list") return;
+  if($("log").classList.contains("on")){ if(e.key === "Escape" || e.key === "l" || e.key === "L") toggleLog(false); return; }
+  if(e.key === " " || e.key === "Enter"){
+    e.preventDefault();
+    if(waiting && waiting.kind === "card"){ const b = $("title").querySelector("button, a.btn"); if(b) b.click(); }
+    else if(!curChoice) advance();
+  }
+  else if(/^[1-9]$/.test(e.key) && curChoice) pick(+e.key - 1);
+  else if(e.key === "a" || e.key === "A") $("auto").click();
+  else if(e.key === "l" || e.key === "L") toggleLog(true);
+});
+
+showList();
+window.__vn = {trace, state(){
+  return {phase, ep, epId:D.episodes[ep].id, typing:!!typing, waiting:waiting && waiting.kind, choices:curChoice ? curChoice.opts.length : 0,
+    choiceId:curChoice ? curChoice.id : null, soundOn, started, bgmPaused:bgm.paused, bgm:bgm.getAttribute("src")};
+}};
+</script>
+</body>
+</html>
