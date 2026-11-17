@@ -32,7 +32,7 @@ a.ch .main{min-width:0}
   <ol id="toc"></ol>
 </main>
 <script>
-const TOC = [{"href": "ch01/index.html", "group": "메인 스토리", "title": "01 그라피티 예술", "n": 14}];
+const TOC = [{"href": "ch01/index.html", "group": "메인 스토리", "title": "01 그라피티 예술", "n": 14}, {"href": "ch02/index.html", "group": "메인 스토리", "title": "02 고난의 여정", "n": 13}];
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 document.getElementById("toc").innerHTML = TOC.map(c =>
   `<li><a class="ch" href="${esc(c.href)}"><span class="main">${c.group ? `<span class="g">${esc(c.group)}</span>` : ""}` +
