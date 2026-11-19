@@ -22,6 +22,7 @@ a.ch .g{display:block;color:var(--muted);font-size:12px;margin-bottom:2px}
 a.ch .tt{display:block;font-size:17px;font-weight:700;word-break:keep-all;overflow-wrap:anywhere}
 a.ch .n{margin-left:auto;color:var(--accent);font-size:13px;white-space:nowrap}
 a.ch .main{min-width:0}
+h2.sec{font-size:15px;color:var(--muted);font-weight:600;letter-spacing:.05em;margin:30px 0 10px}
 </style>
 </head>
 <body>
@@ -29,14 +30,18 @@ a.ch .main{min-width:0}
   <div class="t1">퍼니싱: 그레이 레이븐</div>
   <h1>스토리 다시보기</h1>
   <p class="sub">목차</p>
-  <ol id="toc"></ol>
+  <div id="toc"></div>
 </main>
 <script>
-const TOC = [{"href": "ch01/index.html", "group": "메인 스토리", "title": "01 그라피티 예술", "n": 14}, {"href": "ch02/index.html", "group": "메인 스토리", "title": "02 고난의 여정", "n": 13}, {"href": "ch03/index.html", "group": "메인 스토리", "title": "03 종말의 전시", "n": 13}];
+const TOC = [{"href": "ch01/index.html", "group": "메인 스토리", "title": "01 그라피티 예술", "n": 14, "sec": ""}, {"href": "ch02/index.html", "group": "메인 스토리", "title": "02 고난의 여정", "n": 13, "sec": ""}, {"href": "ch03/index.html", "group": "메인 스토리", "title": "03 종말의 전시", "n": 13, "sec": ""}, {"href": "trust_liv_empyrea/index.html", "group": "", "title": "리브·백야", "n": 7, "sec": "신뢰도 스토리"}];
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-document.getElementById("toc").innerHTML = TOC.map(c =>
-  `<li><a class="ch" href="${esc(c.href)}"><span class="main">${c.group ? `<span class="g">${esc(c.group)}</span>` : ""}` +
-  `<span class="tt">${esc(c.title)}</span></span><span class="n">${c.n}편</span></a></li>`).join("");
+const secs = [];
+for (const c of TOC) { const k = c.sec || ""; let s = secs.find(x => x.k === k); if (!s) secs.push(s = {k, rows: []}); s.rows.push(c); }
+secs.sort((a, b) => (a.k ? 1 : 0) - (b.k ? 1 : 0));
+const item = c => `<li><a class="ch" href="${esc(c.href)}"><span class="main">${c.group ? `<span class="g">${esc(c.group)}</span>` : ""}` +
+  `<span class="tt">${esc(c.title)}</span></span><span class="n">${c.n}편</span></a></li>`;
+document.getElementById("toc").innerHTML = secs.map(s =>
+  (s.k ? `<h2 class="sec">${esc(s.k)}</h2>` : "") + `<ol>${s.rows.map(item).join("")}</ol>`).join("");
 </script>
 </body>
 </html>
